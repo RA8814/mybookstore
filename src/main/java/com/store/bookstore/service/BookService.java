@@ -1,31 +1,16 @@
 package com.store.bookstore.service;
 
 import com.store.bookstore.model.Book;
-import com.store.bookstore.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@Service
-public class BookService {
-    @Autowired
-    private BookRepository bookRepository;
-
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
-    }
-
-    public Book saveBook(Book book) {
-        return bookRepository.save(book);
-    }
-
-    public Book getBookById(Long id) {
-        return bookRepository.findById(id).orElse(null);
-    }
-
-    public void deleteBook(Long id) {
-        bookRepository.deleteById(id);
-    }
+public interface BookService {
+    List<Book> getAllBooks();
+    Book saveBook(Book book);
+    Book getBookById(Long id);
+    void deleteBook(Long id);
+    List<Book> getAllBooksForAuthor(Long id);
+    Book updateBook(Long id, Book updatedBook);
 }
-
