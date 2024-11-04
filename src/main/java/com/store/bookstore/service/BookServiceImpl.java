@@ -1,21 +1,25 @@
 package com.store.bookstore.service;
 
+import com.store.bookstore.dtos.BookDTO;
+import com.store.bookstore.dtos.BookDTOMapper;
 import com.store.bookstore.model.Book;
 import com.store.bookstore.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService  {
     private final BookRepository bookRepository;
+    private final BookDTOMapper bookDTOMapper;
+
     @Autowired
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, BookDTOMapper bookDTOMapper) {
         this.bookRepository = bookRepository;
+        this.bookDTOMapper = bookDTOMapper;
     }
 
     @Override
@@ -24,13 +28,30 @@ public class BookServiceImpl implements BookService  {
     }
 
     @Override
-    public Book saveBook(Book book) {
-        return bookRepository.save(book);
+    public List<BookDTO> getAllBooksDTO() {
+        List<BookDTO> collect = bookRepository.findAll()
+                .stream()
+                .map(bookDTOMapper)
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+    @Override
+    public BookDTO saveBook(Book book) {
+        Book savedBook = bookRepository.save(book);
+        return bookDTOMapper.apply(savedBook);
     }
 
     @Override
     public Book getBookById(Long id) {
         return bookRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public BookDTO getBookByIdDTO(Long id) {
+        Book baseBook = bookRepository.findById(id).orElse(null);
+        BookDTO appliedBook = bookDTOMapper.apply(baseBook);
+        return appliedBook;
     }
 
     @Override
@@ -40,19 +61,22 @@ public class BookServiceImpl implements BookService  {
 
     //test
     @Override
-    public List<Book> getAllBooksForAuthor(Long id){
+    public List<BookDTO> getAllBooksForAuthor(Long id){
         List<Book> allBooks = getAllBooks();
         List<Book> filteredBooks = new ArrayList<>();
         for (Book book : allBooks) {
-            if (book.getAuthor().getId() == id) {
+            if (book.getAuthor() != null && book.getAuthor().getId() == id) {
                 filteredBooks.add(book);
             }
         }
-        return filteredBooks.isEmpty() ? null : filteredBooks;
+        return filteredBooks.isEmpty() ? null : filteredBooks
+                                                .stream()
+                                                .map(bookDTOMapper)
+                                                .collect(Collectors.toList());
     }
 
     @Override
-    public Book updateBook(Long id, Book updatedBook) {
+    public BookDTO updateBook(Long id, Book updatedBook) {
         Book existingBook = getBookById(id);
         if (existingBook == null) {
             return null;
