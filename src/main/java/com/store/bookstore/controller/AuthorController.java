@@ -1,5 +1,6 @@
 package com.store.bookstore.controller;
 
+import com.store.bookstore.dtos.AuthorDTO;
 import com.store.bookstore.model.Author;
 import com.store.bookstore.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +21,24 @@ public class AuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<Author> createAuthor(@RequestBody Author author) {
+    public ResponseEntity<AuthorDTO> createAuthor(@RequestBody Author author) {
         return ResponseEntity.ok(authorService.saveAuthor(author));
     }
 
     @GetMapping
-    public ResponseEntity<List<Author>> getAllAuthors() {
-        return ResponseEntity.ok(authorService.getAllAuthors());
+    public ResponseEntity<List<AuthorDTO>> getAllAuthors() {
+        return ResponseEntity.ok(authorService.getAllAuthorsDTO());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Author> getAuthorById(@PathVariable Long id) {
-        Author author = authorService.getAuthorById(id);
+    public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable Long id) {
+        AuthorDTO author = authorService.getAuthorDTOById(id);
         return author != null ? ResponseEntity.ok(author) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Author> updateAuthor(@PathVariable Long id, @RequestBody Author updatedAuthor) {
-        Author author = authorService.updateAuthor(id, updatedAuthor);
+    public ResponseEntity<AuthorDTO> updateAuthor(@PathVariable Long id, @RequestBody Author updatedAuthor) {
+        AuthorDTO author = authorService.updateAuthor(id, updatedAuthor);
         return author != null ? ResponseEntity.ok(author) : ResponseEntity.notFound().build();
     }
 
